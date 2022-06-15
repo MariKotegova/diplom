@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 public interface TextGraphicsConverter {
+    //Интерфейс конвертера картинок, который вы будете реализовывать
     /**
      * Конвертация изображения, переданного как урл, в текстовую графику.
      * @param url урл изображения
