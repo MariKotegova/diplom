@@ -7,11 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.awt.image.BufferedImage;
 
-
 public class Converted implements TextGraphicsConverter {
 
-    private int newWidth;// ширина
-    private int newHeight; // высота
     private int maxWidth = 0;// ширина
     private int maxHeight = 0; // высота
     private double maxRatio = 0; // соотношение длины и высоты
@@ -21,6 +18,8 @@ public class Converted implements TextGraphicsConverter {
         BufferedImage img = ImageIO.read(new URL(url));
         int width = img.getWidth();
         int height = img.getHeight();
+        int newWidth = width;  //  новая ширина
+        int newHeight = height;  // новая высота
 
         //если соотношение сторон больше заданного, то выкинь исключение
         if ((width / height) > maxRatio && maxRatio != 0) {
@@ -29,10 +28,7 @@ public class Converted implements TextGraphicsConverter {
 
         // если есть максимальная высота и ширина
         if (maxWidth != 0 || maxHeight != 0) {
-            ratio(width, height);
-        } else {
-            this.newWidth = width;
-            this.newHeight = height;
+            ratio(width, height, newWidth, newHeight);
         }
 
         Image scaledImage = img.getScaledInstance(newWidth, newHeight, BufferedImage.SCALE_SMOOTH);
@@ -43,12 +39,12 @@ public class Converted implements TextGraphicsConverter {
 
         // заполняем массив символами  и выводим картинку на экран
         String[][] shemaColor = new String[newWidth][newHeight];
-        String string = print(shemaColor, bwRaster);
+        String string = print(shemaColor, bwRaster, newWidth, newHeight);
         return string;
     }
 
     // если есть максимальная высота и ширина
-    public void ratio (int width, int height){
+    public void ratio(int width, int height, int newWidth, int newHeight) {
         int proportionsWidht = 1;// ширина, соотношение
         int proportionsHeight = 1;// высота, соотношение
         if (maxWidth != 0 && maxWidth < width) {
@@ -64,7 +60,7 @@ public class Converted implements TextGraphicsConverter {
     }
 
     // заполнить массив символами и вывести на экран
-    public String print (String[][] shemaColor, WritableRaster bwRaster){
+    public String print(String[][] shemaColor, WritableRaster bwRaster, int newWidth, int newHeight) {
         ColorsShem schema = new ColorsShem();
 
         for (int i = 0; i < newWidth; i++) {
