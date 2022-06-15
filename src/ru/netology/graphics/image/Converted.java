@@ -1,4 +1,5 @@
 package ru.netology.graphics.image;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.WritableRaster;
@@ -7,7 +8,7 @@ import java.net.URL;
 import java.awt.image.BufferedImage;
 
 
-public class Converted implements TextGraphicsConverter{
+public class Converted implements TextGraphicsConverter {
 
     private int newWidth;// ширина
     private int newHeight; // высота
@@ -15,34 +16,24 @@ public class Converted implements TextGraphicsConverter{
     private int maxHeight = 0; // высота
     private double maxRatio = 0; // соотношение длины и высоты
 
-
     @Override
     public String convert(String url) throws IOException, BadImageSizeException {
         BufferedImage img = ImageIO.read(new URL(url));
-        int Width = img.getWidth();
-        int Height =img.getHeight();
+        int width = img.getWidth();
+        int height = img.getHeight();
 
         //если соотношение сторон больше заданного, то выкинь исключение
-        if((Width / Height) > maxRatio && maxRatio != 0){
-            throw new BadImageSizeException(maxRatio, (Width / Height));
+        if ((width / height) > maxRatio && maxRatio != 0) {
+            throw new BadImageSizeException(maxRatio, (width / height));
         }
 
         // если есть максимальная высота и ширина
-        if (maxWidth != 0 || maxHeight != 0){
-            int x = 1;// ширина, соотношение
-            int y = 1;// высота, соотношение
-            if (maxWidth != 0 && maxWidth < Width){
-                x = Width / maxWidth;}
-            if (maxHeight != 0 && maxHeight < Height){
-                y = Height / maxHeight;
-            }
+        if (maxWidth != 0 || maxHeight != 0) {
+            ratio(width, height);
 
-            double q = (x >= y) ? x : y;
-            newWidth = (int) Math.round(Width / q);
-            newHeight = (int) Math.round(Height / q);
         } else {
-            this.newWidth = Width;
-            this.newHeight = Height;
+            this.newWidth = width;
+            this.newHeight = height;
         }
 
 
@@ -53,11 +44,11 @@ public class Converted implements TextGraphicsConverter{
 
         WritableRaster bwRaster = bwImg.getRaster();
 // заполняем массив символами
-        String [][] shemaColor = new String[newWidth][newHeight];
+        String[][] shemaColor = new String[newWidth][newHeight];
         ColorsShem schema = new ColorsShem();
 
-        for (int i = 0 ; i < newWidth; i++ ) {
-            for (int j = 0 ; j < newHeight; j++) {
+        for (int i = 0; i < newWidth; i++) {
+            for (int j = 0; j < newHeight; j++) {
                 int color = bwRaster.getPixel(i, j, new int[3])[0];
                 char c = schema.convert(color);
                 shemaColor[i][j] = Character.toString(c) + Character.toString(c);
@@ -67,14 +58,29 @@ public class Converted implements TextGraphicsConverter{
 
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0 ; i < newWidth; i++ ) {
-            for (int j = 0 ; j < newHeight; j++) {
+        for (int i = 0; i < newWidth; i++) {
+            for (int j = 0; j < newHeight; j++) {
                 sb.append(shemaColor[i][j]);
             }
             sb.append("\n");
         }
         String string = sb.toString();
         return string;
+    }
+
+    public void ratio (int width, int height){
+        int proportionsWidht = 1;// ширина, соотношение
+        int proportionsHeight = 1;// высота, соотношение
+        if (maxWidth != 0 && maxWidth < width) {
+            proportionsWidht = width / maxWidth;
+        }
+        if (maxHeight != 0 && maxHeight < height) {
+            proportionsHeight = height / maxHeight;
+        }
+
+        double proportions = (proportionsWidht >= proportionsHeight) ? proportionsWidht : proportionsHeight;
+        newWidth = (int) Math.round(width / proportions);
+        newHeight = (int) Math.round(height / proportions);
     }
 
     @Override
